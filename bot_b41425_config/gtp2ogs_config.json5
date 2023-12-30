@@ -1,0 +1,374 @@
+{
+    /** API key for the bot. You can get one from the bot profile page when you
+     *  are logged in as the bot operator.
+     *  REQUIRED*/
+    apikey: "SECRET",
+
+    /** Engine specifier of the bot, this is a plain text description of the
+     * bot's engine and network that will be recorded along with all games
+     * played. */
+    engine: "Katago with kata1-b6c96-s25461504-d4002500.txt",
+
+    /** Maximum time to allow the game to be paused for in seconds.
+     * @default 300
+     * @range 300 - 172800
+     */
+    // max_pause_time: 300,
+
+    /** Players who are not allowed to play the bot ever. */
+    // blacklist: [],
+
+    /** Players who are allowed to challenge the bot with any settings even
+     * when the bot is at the maximum number of simultaneous games */
+    // whitelist: [],
+
+    /** Config for how to run your bot */
+    bot: {
+        /** The command to run the bot. You can also provide this on the command line if you would rather. */
+        command: ["opencl/katago.exe", "gtp", "-config opencl/gtp.cfg", "-model kata1-b6c96-s25461504-d4002500.txt.gz"],
+
+        /** Management method for managing bot instances. `pool` starts up
+         *  a fixed `instances` number of bots and and reuses them for all
+         *  games. `persistent` starts up a single bot instance per game
+         *  and allows state re-use to allow things like pondering.
+         *
+         *  @default "persistent"
+         */
+        // manager: "persistent",
+
+        /** Number of instances of the bot to run in parallel when using the pool manager.
+         *  Exactly this many instances will be run at any given time,
+         *  regardless of how many ongoing games there are.
+         *
+         *  @default 1
+         */
+        // instances: 1,
+
+        /** Enabled clocks being sent to the bot. Clocks will only be sent when
+         * the applicable clock commands are detected from the bot anyways, so this
+         * is generally fine to leave turned on.
+         *
+         * @default true
+         */
+        // enable_clock: true,
+
+        /* Send chats that are output by the bot to the game chat
+         *
+         * Game chats are scanned for by looking at the STDERR output of the bot
+         * client and looking for lines that start with `MALKOVICH: ` or
+         * `DISCUSSION: ` or `MAIN: `. Note, MAIN and DISCUSSION are synonyms.
+         *
+         * @default true
+         */
+        send_chats: true,
+
+        /** Send the principal variation (PV) values. Note that your bot must output this
+         * data in a way that can be parsed.
+         *
+         * @default true
+         */
+        send_pv_data: true,
+
+        /** After a bot makes a move, some bots will continue writing to stderr
+         *  relevant information (such as chats or PV data). This option controls
+         *  how long we wait for the bot to finish writing to stderr before we
+         *  release the bot back into the pool of available bots.
+         *
+         *  @unit milliseconds
+         *  @default 100
+         */
+        // release_delay: 100,
+
+        /** When a bot is to shutdown we send a `quit` command to the bot.
+         *  This grace period is the number of milliseconds to wait for the bot to
+         *  quit gracefully before sending a `SIGTERM` to the bot. Furthermore,
+         *  if the bot doesn't terminate after the `SIGTERM` for another grace
+         *  period, we will send a `SIGKILL` to the bot.
+         *
+         *  @unit milliseconds
+         *  @default 5000
+         */
+        // quit_grace_period: 5000,
+
+        /** When the manager is set to "persistent", If no moves are made within
+         *  this timeout, the bot process is terminated. If a new move is made
+         *  a new process will be started to resume playing the game.
+         *
+         *  @unit milliseconds
+         *  @default 600000
+         */
+        // persistent_idle_timeout: 600000, // 10 minutes
+    },
+
+    /** Bot to use for playing opening moves. This can be useful for ensuring
+     * your bot plays at least a few reasonable joseki moves if it is a weak
+     * bot.
+     *
+     * The config for this bot is just like the main bot, with one additional
+     * option:
+     *
+     * `number_of_opening_moves_to_play`
+     * Which is number of opening moves to play before switching to the main bot.
+     */
+    
+    opening_bot: {
+        command: ["opencl/katago.exe", "gtp", "-config opencl/gtp.cfg", "-model b18c384nbt-optimisticv13-s5971M.bin.gz"],
+        // manager: "persistent",
+        // instances: 1,
+        // enable_clock: true,
+        send_chats: true,
+        // send_pv_data: true,
+        // release_delay: 100,
+        number_of_opening_moves_to_play: 16,
+        // persistent_idle_timeout: 600000, // 10 minutes
+    },
+    
+
+    /** Secondary bot to use for ensuring your real bot passes or resigns
+     * appropriately. This bot will be consulted every move after . If the move it
+     * returns is a pass it will override the move your bot has made (unless
+     * your bot is resigning). If the move it returns is a resign, it will
+     * count the number of successive resigns and if it is more than the number
+     * of allowed resigns you've set in this config (default of 3), it will
+     * override your bot's move with a resign.
+     *
+     * The configuration for this bot is just like the main bot, with two additional
+     * options:
+     *
+     * `allowed_resigns`
+     * Which is the number of successive resigns allowed before the bot will resign.
+     *
+     * `moves_to_allow_before_checking_ratio`
+     * Which is the ratio of the board size to the number of moves
+     * to allow before we will start checking the ending bot for
+     * passes and resigns. This is to prevent the bot from resigning
+     * too early in a game.
+     *
+     * The move to start consulting the ending bot is calculated by taking
+     *
+     *    ceil(board_height * board_width * ratio)
+     *
+     * @allowed 0.1 - 1.0
+     * @default 0.8
+     */
+	 /*
+    ending_bot: {
+        // command: string[];
+        command: ["opencl/katago.exe", "gtp", "-config opencl/gtp.cfg", "-model b18c384nbt-optimisticv13-s5971M.bin.gz"],
+        // manager: "persistent",
+        // instances: 1,
+        // enable_clock: true,
+        // send_chats: true,
+        // send_pv_data: true,
+        // release_delay: 100,
+        allowed_resigns: 3,
+        moves_to_allow_before_checking_ratio: 0.1,
+        // persistent_idle_timeout: 600000, // 10 minutes
+    },
+	*/
+
+    /** Message to send to the player at the start of the game */
+    
+    greeting: {
+        en: "Whenever this bot is running, my PC contributes to protein shape research! More info and bot config at https://github.com/balazsbme/bots-at-online-go.com",
+        fr: "Chaque fois que ce robot est en cours d’exécution, mon PC contribue à la recherche sur la forme des protéines ! Plus d'informations et configuration du bot sur https://github.com/balazsbme/bots-at-online-go.com",
+        de: "Immer wenn dieser Bot läuft, trägt mein PC zur Proteinformforschung bei! Weitere Informationen und Bot-Konfiguration unter https://github.com/balazsbme/bots-at-online-go.com",
+        es: "¡Siempre que este robot se ejecuta, mi PC contribuye a la investigación de la forma de las proteínas! Más información y configuración del bot en https://github.com/balazsbme/bots-at-online-go.com",
+        it: "Ogni volta che questo bot è in esecuzione, il mio PC contribuisce alla ricerca sulla forma delle proteine! Maggiori informazioni e configurazione del bot su https://github.com/balazsbme/bots-at-online-go.com",
+        ja: "このボットが実行されているときはいつでも、私の PC はタンパク質の形状研究に貢献します。 詳細とボット構成については、https://github.com/balazsbme/bots-at-online-go.com をご覧ください。",
+        ko: "이 봇이 실행될 때마다 내 PC는 단백질 형태 연구에 기여합니다! 자세한 정보 및 봇 구성은 https://github.com/balazsbme/bots-at-online-go.com 에서 확인하세요.",
+        nl: "Wanneer deze bot draait, draagt mijn pc bij aan het onderzoek naar de vorm van eiwitten! Meer informatie en botconfiguratie op https://github.com/balazsbme/bots-at-online-go.com",
+        pl: "Ilekroć ten bot jest uruchomiony, mój komputer uczestniczy w badaniach nad kształtem białek! Więcej informacji i konfiguracja bota na https://github.com/balazsbme/bots-at-online-go.com",
+        pt: "Sempre que este bot está em execução, meu PC contribui para a pesquisa do formato das proteínas! Mais informações e configuração do bot em https://github.com/balazsbme/bots-at-online-go.com",
+        ru: "Каждый раз, когда этот бот работает, мой компьютер участвует в исследовании формы белка! Дополнительная информация и настройка бота на https://github.com/balazsbme/bots-at-online-go.com",
+        "zh-tw": "每当这个机器人运行时，我的电脑就会为蛋白质形状研究做出贡献！ 更多信息和机器人配置请访问 https://github.com/balazsbme/bots-at-online-go.com",
+        "zh-cn": "每当这个机器人运行时，我的电脑就会为蛋白质形状研究做出贡献！ 更多信息和机器人配置请访问 https://github.com/balazsbme/bots-at-online-go.com",
+    },
+    
+
+    /** Message to send to the player when the game is over */
+    /*
+    farewell: {
+        en: "Thank you for the game!",
+        fr: "Merci pour la partie!",
+        de: "Danke für das Spiel!",
+        es: "¡Gracias por el juego!",
+        it: "Grazie per la partita!",
+        ja: "ゲームありがとうございました！",
+        ko: "게임 감사합니다!",
+        nl: "Bedankt voor het spel!",
+        pl: "Dziękuję za grę!",
+        pt: "Obrigado pelo jogo!",
+        ru: "Спасибо за игру!",
+        "zh-tw": "謝謝你的遊戲！",
+        "zh-cn": "谢谢你的游戏！",
+    },
+    */
+
+    /** Send a message saying what the bot thought the score was at the end of the game */
+    farewellscore: true,
+
+    /** File to write logs to. Logs will be sent to stdout as well. */
+    // logfile: undefined,
+
+    /** Time control systems that we can work with
+     *  @default ["fischer", "byoyomi", "simple"]
+     *  @allowedValues ["fischer", "byoyomi", "simple"]
+     *  @minItems 1
+     */
+    // allowed_time_control_systems: ["fischer", "byoyomi", "simple"],
+
+    /**
+     * Allowed blitz times for the bot. Blitz is disabled by default, but you
+     * can enable it by providing accetpable time settings.
+     *
+     * @default null
+     */
+    allowed_blitz_settings: {
+		simple: {
+            per_move_time_range: [10, 20],
+        },
+
+        byoyomi: {
+            main_time_range: [0, 600],
+            period_time_range: [10, 20],
+            periods_range: [1, 10],
+        },
+
+        fischer: {
+            max_time_range: [30, 60],
+            time_increment_range: [10, 20],
+        },
+
+        concurrent_games: 3,
+	},
+
+    /** Allowed live game times for bot. */
+    
+    allowed_live_settings: {
+        simple: {
+            per_move_time_range: [10, 300],
+        },
+
+        byoyomi: {
+            main_time_range: [0, 3600],
+            period_time_range: [10, 300],
+            periods_range: [1, 10],
+        },
+
+        fischer: {
+            max_time_range: [30, 600],
+            time_increment_range: [10, 300],
+        },
+
+        concurrent_games: 3,
+    },
+    
+
+    /** Allowed correspondence game times for bot. */
+    allowed_correspondence_settings: {
+        simple: {
+            per_move_time_range: [43200, 604800],
+        },
+
+        byoyomi: {
+            main_time_range: [0, 604800],
+            period_time_range: [43200, 604800],
+            periods_range: [1, 10],
+        },
+
+        fischer: {
+            max_time_range: [86400, 604800],
+            time_increment_range: [43200, 604800],
+        },
+        concurrent_games: 50,
+    }
+    
+
+    /** Allowed board sizes for the bot. If there are no restrictions, you can
+     *  provide "all", or if you can play on any square board, you can provide "square".
+     *
+     *  You can also provide explicit width and height ranges for non square boards
+     *  with `{width_range: [min, max], height_range: [min, max]}`.
+     *
+     *  @default [9, 13, 19]
+     */
+    // allowed_board_sizes: [9, 13, 19],
+
+    /** Allowed unranked games
+     *  @default true
+     */
+    // allow_unranked: true,
+
+    /** Allowed ranked games
+     *  @default true
+     */
+    // allow_ranked: true,
+
+    /** Allowed range for ranked games
+     * @default ["30k", "9p"]
+     */
+    //allowed_rank_range: ["30k", "9p"],
+
+    /** Allow handicap in ranked games
+     *  @default true
+     */
+    // allow_ranked_handicap: true,
+
+    /** Allow handicap in unranked games
+     *  @default true
+     */
+    // allow_unranked_handicap: true,
+
+    /** Allowed komi range. Negative numbers indicate reverse Komi.
+     *  @default [-99, 99]
+     */
+    // allowed_komi_range: [-99, 99],
+
+    /** Allowed komi range
+     *  @default true
+     */
+    // allowed_komi_range: true,
+
+    /** Hide the bot from the public bot list
+     * @default false
+     */
+    // hidden: false,
+
+    /** Decline all new challenges. This implies hidden.
+     * @default false
+     */
+    // decline_new_challenges: false,
+
+    /** Used for debugging, will issue a showboard command when we've loaded
+     * the board state into the bot
+     * @default false
+     */
+    // showboard: false,
+
+    /** If set, bot moves will be delayed when made before `min_move_time` ms.
+     * This is primarily a user experience thing as can make players feel rushed
+     * if the bots are responding too quickly.
+     *
+     * @default 1500
+     */
+    // min_move_time: 1500,
+
+    /** Maximum amount of ongoing games to allow concurrently by the same player
+     * @default 1
+     */
+    // max_games_per_player: 1,
+
+    /** Enable verbose logging.
+     *  @values 0-2
+     *  @default 0
+     */
+    // verbosity: 0,
+
+    /** Sets how often the status lines are printed to the screen. Set to 0 to
+     * disable.
+     * units: milliseconds
+     * @default 60000
+     */
+    // status_update_frequency : 60000,
+}
