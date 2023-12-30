@@ -1,7 +1,7 @@
 # bots-at-online-go.com
 
-https://stats.foldingathome.org/team/1065163
+Whenever this bot is running, my PC contributes to protein shape research! Consider lending your spare CPU/GPU capacity to science and contribute yourself!
+You can read more about Folding@Home distributed computing project here: https://foldingathome.org/
 
-TODO: add my bot stats and explain folding@home
+Join my team and let's fold together: https://stats.foldingathome.org/team/1065163
 
-Add message to bot
